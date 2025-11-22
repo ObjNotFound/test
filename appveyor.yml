@@ -1,0 +1,31 @@
+version: 1.0.{build}
+
+# 使用 Visual Studio 2022
+image: Visual Studio 2022
+
+# 克隆整个项目（包含子模块等）
+clone_depth: 1
+
+install:
+  # 如果项目里有 NuGet（看起来没有，但留着不影响）
+  - nuget restore StereovisionHacks.sln
+
+build_script:
+  # 用 MSBuild 构建整个 .sln
+  # 你仓库里没有说明平台，我默认你要 x64（最常见）
+  # 如果需要 Win32 我可以再给你加上
+  - msbuild StereovisionHacks.sln /m /p:Configuration=Release /p:Platform=x64
+
+# 上传所有编译出来的 DLL
+artifacts:
+  # 所有目录下的 Release DLL（最通用）
+  - path: "**\\Release\\*.dll"
+    name: DLLs
+
+  # 如果某些项目是 x64/Release
+  - path: "**\\x64\\Release\\*.dll"
+    name: Win64DLLs
+
+  # 如果有 Win32（不确定，你先试）
+  - path: "**\\Win32\\Release\\*.dll"
+    name: Win32DLLs
